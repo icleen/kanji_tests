@@ -12,6 +12,7 @@ import kanji_prepper as prep
 
 import tensorflow as tf
 from tensorflow.python import debug as tf_debug
+from tensorflow.contrib.tensorboard.plugins import projector
 
 FLAGS = None
 
@@ -174,7 +175,7 @@ def main(_):
     # adding the seventh convolutional layer
     with tf.name_scope('conv_layer7'):
         with tf.name_scope('weights'):
-            W_conv7 = weight_variable([kernel_size, kernel_size, 32, 64], "w7")
+            W_conv7 = weight_variable([kernel_size, kernel_size, 64, 64], "w7")
             variable_summaries(W_conv7)
         with tf.name_scope('biases'):
             b_conv7 = bias_variable([64], "b7")
@@ -196,10 +197,10 @@ def main(_):
 
     # the second pooling layer
     with tf.name_scope('pooling2'):
-        h_pool2 = max_pool_2x2(h_conv4)
+        h_pool2 = max_pool_2x2(h_conv8)
     #     pool2_img = tf.reshape(h_pool2, [-1,width,height,1])
     #     tf.summary.image('pool2', pool2_img, classes)
-    h_pool2_flat = tf.reshape(h_pool3, [-1, 8 * 8 * 64])
+    h_pool2_flat = tf.reshape(h_pool2, [-1, 8 * 8 * 64])
 
     #adding the final layer
     with tf.name_scope('fully_connected'):
@@ -208,7 +209,7 @@ def main(_):
             variable_summaries(W_fc1)
         b_fc1 = bias_variable([3442], "b_fc1")
         with tf.name_scope('activations'):
-            h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
+            h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
             variable_summaries(h_fc1)
 
     # adding the dropout
@@ -271,32 +272,37 @@ def main(_):
             train_accuracy = accuracy.eval(feed_dict={
                 x:batchx, y_: batchy, keep_prob: 1.0})
             print("step %d, training accuracy %g"%(i, train_accuracy))
-            save_path = saver.save(sess, save_location + run_number + "/model.ckpt")
+            save_path = saver.save(sess, save_location + run_number + "/model.ckpt", i)
         if a < batch_size:
             epoch += 1
             acc = get_accuracy(i)
             print("epoch %d, validation accuracy %g"%(epoch, acc))
 
-    # tot_acc = 0.0
-    # length = len(validation)
-    # failed = []
-    # f_labels = []
-    # for i in range(length):
-    #     summary, acc = sess.run([merged, accuracy], feed_dict={
-    #         x: validation[i:i+1],
-    #         y_: v_labels[i:i+1],
-    #         keep_prob: 1.0})
-    #     failed.append(validation[i])
-    #     f_labels.append(v_labels[i])
-    #     tot_acc += acc
-    #     # print('curent %g, total %g'%(acc, tot_acc))
-    # tot_acc /= length
-    # print("validation accuracy %g"%tot_acc)
-    #
-    # with open('f_labels.txt', 'w') as f:
-    #     f.write(f_labels)
+    # Create randomly initialized embedding weights which will be trained.
+    N = classes # Number of items (classes).
+    D = 200 # Dimensionality of the embedding.
+    embedding_var = tf.Variable(tf.random_normal([N,D]), name='image_embedding')
 
-    save_path = saver.save(sess, save_location + run_number + "/model.ckpt")
+    # Format: tensorflow/tensorboard/plugins/projector/projector_config.proto
+    config = projector.ProjectorConfig()
+
+    # You can add multiple embeddings. Here we add only one.
+    embedding = config.embeddings.add()
+    embedding.sprite.image_path = 'home/workspace/kanji_tests/master.jpg'
+    # Specify the width and height of a single thumbnail.
+    embedding.sprite.single_image_dim.extend([20, 20])
+    embedding.tensor_name = embedding_var.name
+    # Link this tensor to its metadata file (e.g. labels).
+    # embedding.metadata_path = os.path.join('sprites20/', 'labels.tsv')
+
+    # Use the same LOG_DIR where you stored your checkpoint.
+    summary_writer = tf.summary.FileWriter(save_location + run_number)
+
+    # The next line writes a projector_config.pbtxt in the LOG_DIR. TensorBoard will
+    # read this file during startup.
+    projector.visualize_embeddings(summary_writer, config)
+
+    save_path = saver.save(sess, save_location + run_number + "/model.ckpt", i + 1)
     train_writer.close()
     validation_writer.close()
 

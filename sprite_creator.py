@@ -82,8 +82,8 @@ def make_the_sprite(size):
     print ("created")
     return master
 
-if __name__ == "__main__":
-    json_path = sys.argv[1]
+
+def make_sprite(json_path):
     img_size = 20
     number_per_folder = 80
     sqrt_number = 30
@@ -104,6 +104,10 @@ if __name__ == "__main__":
     for i in range(num_subdirs):
         print(sprite_folder + '/' + str(i))
         sprite_img = make_one_sprite(i, number_per_folder, img_size, sprite_folder, str(i), sprite_img, save_path)
+
+if __name__ == "__main__":
+    json_path = sys.argv[1]
+    make_sprite(json_path)
 
 
 

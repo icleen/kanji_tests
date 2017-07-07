@@ -174,7 +174,7 @@ def main(_):
     # adding the seventh convolutional layer
     with tf.name_scope('conv_layer7'):
         with tf.name_scope('weights'):
-            W_conv7 = weight_variable([kernel_size, kernel_size, 32, 64], "w7")
+            W_conv7 = weight_variable([kernel_size, kernel_size, 64, 64], "w7")
             variable_summaries(W_conv7)
         with tf.name_scope('biases'):
             b_conv7 = bias_variable([64], "b7")
@@ -196,10 +196,10 @@ def main(_):
 
     # the second pooling layer
     with tf.name_scope('pooling2'):
-        h_pool2 = max_pool_2x2(h_conv4)
+        h_pool2 = max_pool_2x2(h_conv8)
     #     pool2_img = tf.reshape(h_pool2, [-1,width,height,1])
     #     tf.summary.image('pool2', pool2_img, classes)
-    h_pool2_flat = tf.reshape(h_pool3, [-1, 8 * 8 * 64])
+    h_pool2_flat = tf.reshape(h_pool2, [-1, 8 * 8 * 64])
 
     #adding the first fully connected layer
     with tf.name_scope('fully_connected1'):
@@ -281,7 +281,7 @@ def main(_):
             train_accuracy = accuracy.eval(feed_dict={
                 x:batchx, y_: batchy, keep_prob: 1.0})
             print("step %d, training accuracy %g"%(i, train_accuracy))
-            save_path = saver.save(sess, save_location + run_number + "/model.ckpt")
+            save_path = saver.save(sess, save_location + run_number + "/model.ckpt", i)
         if a < batch_size:
             epoch += 1
             acc = get_accuracy(i)
@@ -306,7 +306,7 @@ def main(_):
     # with open('f_labels.txt', 'w') as f:
     #     f.write(f_labels)
 
-    save_path = saver.save(sess, save_location + run_number + "/model.ckpt")
+    save_path = saver.save(sess, save_location + run_number + "/model.ckpt", i + 1)
     train_writer.close()
     validation_writer.close()
 

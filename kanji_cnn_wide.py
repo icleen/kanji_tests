@@ -225,7 +225,7 @@ def main(_):
             train_accuracy = accuracy.eval(feed_dict={
                 x:batchx, y_: batchy, keep_prob: 1.0})
             print("step %d, training accuracy %g"%(i, train_accuracy))
-            save_path = saver.save(sess, save_location + run_number + "/model.ckpt")
+            save_path = saver.save(sess, save_location + run_number + "/model.ckpt", i)
         if a < batch_size:
             epoch += 1
             acc = get_accuracy(i)
