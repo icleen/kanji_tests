@@ -47,50 +47,29 @@ def make_sprites(json_path, img_size, number_per_folder):
             string = str(str(i) + '_' + str(label) + '\n')
             f.write(string)
 
-def make_one_sprite(img_size, sqrt_number, folder, subdir):
+def make_one_sprite(index, number_per_folder, img_size, folder, subdir, sprite_img, save_path):
     #get your images using glob
     iconMap = glob.glob(folder + '/' + subdir + '/*.jpg')
-    #just take the even ones
     iconMap = sorted(iconMap)
-    #iconMap = iconMap[::2]
 
     print (len(iconMap))
-
     images = [Image.open(filename) for filename in iconMap]
-
     print ("%d images will be combined" % len(images))
-
-    image_width, image_height = images[0].size
-
-    print ("all images assumed to be %d by %d" % (image_width, image_height))
-
-    master_width = img_size * sqrt_number # image size * sqrt(len(images))
-    master_height = img_size * sqrt_number
-
-    print ("the master image will by %d by %d" % (master_width, master_height))
-    print ("creating image...")
-    master = Image.new(
-        mode='RGBA',
-        size=(master_width, master_height),
-        color=(0,0,0,0))  # fully transparent
-
-    print ("created")
+    assert(len(images) <= number_per_folder)
 
     x = 0
-    y = -1
-    image_per_row = int(master_width / image_width)
+    y = index
+    image_per_row = int(number_per_folder)
     for count, image in enumerate(images):
-        x = count % image_per_row
-        if x == 0:
-            y += 1
-        locationx = x * image_width
-        locationy = y * image_height
-        master.paste(image,(locationx,locationy))
+        # x = count % image_per_row
+        locationx = count * img_size
+        locationy = y * img_size
+        sprite_img.paste(image,(locationx,locationy))
     print ("done adding icons")
-    save_path = str('sprites' + str(img_size) + '/master' + str(subdir) + '.jpg')
     print ('saving ' + save_path + '...')
-    master.save(save_path, transparency=0)
+    sprite_img.save(save_path, transparency=0)
     print ("saved")
+    return sprite_img
 
 
 def make_the_sprite(size):
@@ -112,17 +91,19 @@ if __name__ == "__main__":
     folder_count = -1
     sprite_folder = str('sprites' + str(img_size))
 
-    subdirs = []
+    # subdirs = []
+    num_subdirs = 0
     for name in os.listdir(sprite_folder):
         if os.path.isdir(os.path.join(sprite_folder, name)):
-            subdirs.append(name)
+            # subdirs.append(name)
+            num_subdirs += 1
 
     sprite_img = make_the_sprite(number_per_folder * img_size)
-
-    subdirs.sort()
-    for subdir in subdirs:
-        print(sprite_folder + '/' + subdir)
-        make_one_sprite(img_size, sqrt_number, sprite_folder, subdir)
+    save_path = str('sprites' + str(img_size) + '/master.jpg')
+    # subdirs.sort()
+    for i in range(num_subdirs):
+        print(sprite_folder + '/' + str(i))
+        sprite_img = make_one_sprite(i, number_per_folder, img_size, sprite_folder, str(i), sprite_img, save_path)
 
 
 
