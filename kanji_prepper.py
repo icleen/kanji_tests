@@ -13,7 +13,8 @@ def make_dictionary(folder_list):
     for i, folder in enumerate(folder_list):
         key = os.path.basename(folder).split('/')[0]
         dictionary[key] = i
-
+    with open('kanji_dictionary.json', 'w') as f:
+        json.dump(dictionary, f)
     return dictionary
 
 def make_json():

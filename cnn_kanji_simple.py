@@ -243,7 +243,7 @@ def main(_):
             print('Accuracy at step %s: %s' % (i, acc))
             save_path = saver.save(sess, save_location + "/model.ckpt", i)
 
-    save_path = saver.save(sess, save_location + "/model.ckpt")
+    save_path = saver.save(sess, save_location + "/model.ckpt", steps)
     summary, acc = sess.run([merged, accuracy], feed_dict={x: validation,y_: v_labels,keep_prob: 1.0})
     test_writer.add_summary(summary, i)
     print('Accuracy at step %s: %s' % (i, acc))
