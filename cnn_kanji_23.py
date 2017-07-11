@@ -90,10 +90,10 @@ def main(_):
     batch_size = 50
     test_batch = 533 # number in set = 6396, 6396 / 12 = 533
     steps = 5000
-    epochs = 3
+    epochs = 15
     kernel_size = 3
     learn_rate = 0.0001
-    net_name = 'cnn_kanji_wide2'
+    net_name = 'cnn_kanji_23'
     save_location = str('/tmp/tensorflow/cnn_kanji/' + net_name)
     run_number = '/0'
 
@@ -111,7 +111,7 @@ def main(_):
 
     with tf.name_scope('input_reshape'):
         x_image = tf.reshape(x, [-1,width,height,1])
-        tf.summary.image('input', x_image, classes)
+        # tf.summary.image('input', x_image, classes)
 
     # adding the first convolutional layer
     with tf.name_scope('conv_layer1'):
@@ -127,10 +127,10 @@ def main(_):
     # adding the second convolutional layer
     with tf.name_scope('conv_layer2'):
         with tf.name_scope('weights'):
-            W_conv2 = weight_variable([kernel_size, kernel_size, 32, 64], "w2")
+            W_conv2 = weight_variable([kernel_size, kernel_size, 32, 32], "w2")
             variable_summaries(W_conv2)
         with tf.name_scope('biases'):
-            b_conv2 = bias_variable([64], "b2")
+            b_conv2 = bias_variable([32], "b2")
         with tf.name_scope('activations'):
             h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2) + b_conv2)
             variable_summaries(h_conv2)
@@ -145,10 +145,10 @@ def main(_):
     # adding the third convolutional layer
     with tf.name_scope('conv_layer3'):
         with tf.name_scope('weights'):
-            W_conv3 = weight_variable([kernel_size, kernel_size, 64, 128], "w3")
+            W_conv3 = weight_variable([kernel_size, kernel_size, 32, 32], "w3")
             variable_summaries(W_conv3)
         with tf.name_scope('biases'):
-            b_conv3 = bias_variable([128], "b3")
+            b_conv3 = bias_variable([32], "b3")
         with tf.name_scope('activations'):
             h_conv3 = tf.nn.relu(conv2d(h_pool1, W_conv3) + b_conv3)
             variable_summaries(h_conv3)
@@ -156,10 +156,10 @@ def main(_):
     # adding the fourth convolutional layer
     with tf.name_scope('conv_layer4'):
         with tf.name_scope('weights'):
-            W_conv4 = weight_variable([kernel_size, kernel_size, 128, 256], "w4")
+            W_conv4 = weight_variable([kernel_size, kernel_size, 32, 64], "w4")
             variable_summaries(W_conv4)
         with tf.name_scope('biases'):
-            b_conv4 = bias_variable([256], "b4")
+            b_conv4 = bias_variable([64], "b4")
         with tf.name_scope('activations'):
             h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
             variable_summaries(h_conv4)
@@ -170,30 +170,66 @@ def main(_):
     #     pool2_img = tf.reshape(h_pool2, [-1,width,height,1])
     #     tf.summary.image('pool2', pool2_img, classes)
 
-    h_pool2_flat = tf.reshape(h_pool2, [-1, 8 * 8 * 256])
+    # adding the fifth convolutional layer
+    with tf.name_scope('conv_layer5'):
+        with tf.name_scope('weights'):
+            W_conv5 = weight_variable([kernel_size, kernel_size, 64, 64], "w5")
+            variable_summaries(W_conv5)
+        with tf.name_scope('biases'):
+            b_conv5 = bias_variable([64], "b5")
+        with tf.name_scope('activations'):
+            h_conv5 = tf.nn.relu(conv2d(h_pool2, W_conv5) + b_conv5)
+            variable_summaries(h_conv5)
+
+    # adding the sixth convolutional layer
+    with tf.name_scope('conv_layer6'):
+        with tf.name_scope('weights'):
+            W_conv6 = weight_variable([kernel_size, kernel_size, 64, 64], "w6")
+            variable_summaries(W_conv6)
+        with tf.name_scope('biases'):
+            b_conv6 = bias_variable([64], "b6")
+        with tf.name_scope('activations'):
+            h_conv6 = tf.nn.relu(conv2d(h_conv5, W_conv6) + b_conv6)
+            variable_summaries(h_conv6)
+
+    # the third pooling layer
+    with tf.name_scope('pooling3'):
+        h_pool3 = max_pool_2x2(h_conv6)
+    #     pool3_img = tf.reshape(h_pool3, [-1,width,height,1])
+    #     tf.summary.image('pool3', pool3_img, classes)
+    h_pool3_flat = tf.reshape(h_pool3, [-1, 4 * 4 * 64])
 
     #adding the final layer
-    with tf.name_scope('fully_connected'):
-        W_fc1 = weight_variable([8 * 8 * 256, 3442], "W_fc1")
+    with tf.name_scope('fully_connected1'):
+        W_fc1 = weight_variable([4 * 4 * 64, 3442], "W_fc1")
         b_fc1 = bias_variable([3442], "b_fc1")
         with tf.name_scope('weights'):
             variable_summaries(W_fc1)
         with tf.name_scope('activations'):
-            h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+            h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
             variable_summaries(h_fc1)
 
     # adding the dropout
     keep_prob = tf.placeholder(tf.float32)
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
+    with tf.name_scope('fully_connected2'):
+        with tf.name_scope('weights'):
+            W_fc2 = weight_variable([3442, 3442], "W_fc2")
+            variable_summaries(W_fc1)
+        b_fc2 = bias_variable([3442], "b_fc2")
+        with tf.name_scope('activations'):
+            h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+            variable_summaries(h_fc2)
+
     # adding the readout layer
     with tf.name_scope('readout_layer'):
-        W_fc3 = weight_variable([3442, classes], "w_read")
-        b_fc3 = bias_variable([classes], "b_read")
         with tf.name_scope('weights'):
-            variable_summaries(W_fc3)
+            W_fc_read = weight_variable([3442, classes], "w_read")
+            variable_summaries(W_fc_read)
+        b_fc_read = bias_variable([classes], "b_read")
         with tf.name_scope('activations'):
-            y_conv = tf.matmul(h_fc1_drop, W_fc3) + b_fc3
+            y_conv = tf.matmul(h_fc2, W_fc_read) + b_fc_read
             variable_summaries(y_conv)
 
     # The raw formulation of cross-entropy,
@@ -220,11 +256,8 @@ def main(_):
 
     # Add ops to save and restore all the variables.
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter(
-            save_location + run_number + '/logs/kanji_with_summaries/train',
-            sess.graph)
-    validation_writer = tf.summary.FileWriter(
-            save_location + run_number + '/logs/kanji_with_summaries/validation')
+    train_writer = tf.summary.FileWriter(save_location + run_number + '/logs/kanji_with_summaries/train', sess.graph)
+    validation_writer = tf.summary.FileWriter(save_location + run_number + '/logs/kanji_with_summaries/validation')
     tf.global_variables_initializer().run()
     saver = tf.train.Saver()
     # if os.path.exists(os.path.join(save_location + run_number)):

@@ -90,11 +90,11 @@ def main(_):
     batch_size = 50
     test_batch = 533 # number in set = 6396, 6396 / 12 = 533
     steps = 5000
-    epochs = 3
+    epochs = 15
     kernel_size = 3
     learn_rate = 0.0001
     save_location = "/tmp/tensorflow/kanji/kanji_cnn_5"
-    run_number = '/0'
+    run_number = '/1'
 
     # Import data
     training, t_labels, validation, val_labels = prep.data_from_base('train_val_test_data_32')
@@ -213,8 +213,11 @@ def main(_):
 
     # Add ops to save and restore all the variables.
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter(save_location + run_number + '/logs/kanji_with_summaries/train', sess.graph)
-    validation_writer = tf.summary.FileWriter(save_location + run_number + '/logs/kanji_with_summaries/validation')
+    train_writer = tf.summary.FileWriter(
+            save_location + run_number + '/logs/kanji_with_summaries/train',
+            sess.graph)
+    validation_writer = tf.summary.FileWriter(
+            save_location + run_number + '/logs/kanji_with_summaries/validation')
     tf.global_variables_initializer().run()
     saver = tf.train.Saver()
     # if os.path.exists(os.path.join(save_location + run_number)):
@@ -242,7 +245,6 @@ def main(_):
             epoch += 1
             acc = get_accuracy(i)
             print("epoch %d, validation accuracy %g"%(epoch, acc))
-
 
     write_predictions()
 

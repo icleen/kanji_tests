@@ -2,11 +2,13 @@ import os
 import sys
 import json
 
-def make_html(prediction_file, dictionary_file, validation_file):
-    print(os.getcwd())
-    cwd = str(os.getcwd())
-    home_path = str('file://' + cwd)
-    print(home_path)
+def make_html(net_name, prediction_file, dictionary_file, validation_file):
+    # print(os.getcwd())
+    # cwd = str(os.getcwd())
+    # home_path = str('file://' + cwd)
+    # print(home_path)
+
+    home_path = str('file:///home/iclee141/workspace/kanji_tests')
 
     predictions = []
     correct = []
@@ -29,7 +31,7 @@ def make_html(prediction_file, dictionary_file, validation_file):
         pics = json.load(f)
 
 
-    root = 'prediction_errors'
+    root = str(net_name + '_prediction_errors')
     if not os.path.isdir(root):
         os.makedirs(root)
 
@@ -43,8 +45,9 @@ def make_html(prediction_file, dictionary_file, validation_file):
         pred_utf = pred_str.split('+')[1]
         cor_str = dictionary[cor]
         cor_utf = cor_str.split('+')[1]
-        file_path = str(root + '/' + str(i) + '_' + pred_str + '.html')
-        full_path = str(home_path + file_path)
+
+        file_path = str(root + '/' + str(i) + '_' + cor_str + '.html')
+        full_path = str(home_path + '/' + file_path)
         if pred == cor:
             cors.append((full_path, dictionary[cor]))
         else:
@@ -52,7 +55,7 @@ def make_html(prediction_file, dictionary_file, validation_file):
         with open(file_path, 'w') as f:
             f.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
-            f.write('<img src="' + home_path + img_path + '" height="100" width="100">')
+            f.write('<img src="' + home_path + '/' + img_path + '" height="100" width="100">')
             f.write('<p>Predicted: </p>')
             f.write('<a href="http://www.fileformat.info/info/unicode/char/' + pred_utf + '/index.htm">' + pred_str + '</a>')
             f.write('<p>Ground Truth: </p>')
@@ -61,7 +64,8 @@ def make_html(prediction_file, dictionary_file, validation_file):
 
             f.write('</body>\n</html>\n')
 
-    with open('predictions.html', 'w') as f:
+    html_file = str(net_name + '_predictions.html')
+    with open(html_file, 'w') as f:
         f.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
         f.write('<h1>errors</h1>\n')
@@ -84,4 +88,4 @@ if __name__ == '__main__':
     dictionary_file = sys.argv[2]
     validation_file = sys.argv[3]
 
-    make_html(prediction_file, dictionary_file, validation_file)
+    make_html('test_net', prediction_file, dictionary_file, validation_file)
