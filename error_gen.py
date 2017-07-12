@@ -7,8 +7,8 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
     # cwd = str(os.getcwd())
     # home_path = str('file://' + cwd)
     # print(home_path)
-
-    home_path = str('file:///home/iclee141/workspace/kanji_tests/predictions')
+    root_path = '/home/iclee141/workspace/kanji_tests'
+    home_path = str('file://' + root_path)
 
     predictions = []
     correct = []
@@ -31,7 +31,7 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
         pics = json.load(f)
 
 
-    root = str(net_name + '_prediction_errors')
+    root = str('/predictions/' + net_name + '_prediction_errors')
     if not os.path.isdir(root):
         os.makedirs(root)
 

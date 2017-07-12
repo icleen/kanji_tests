@@ -182,7 +182,7 @@ def main(_):
 
     # the fourth pooling layer
     with tf.name_scope('pooling4'):
-        h_pool4 = max_pool_2x2(h_conv8)
+        h_pool4 = max_pool_2x2(h_conv4)
     #     pool3_img = tf.reshape(h_pool3, [-1,width,height,1])
     #     tf.summary.image('pool3', pool3_img, classes)
 

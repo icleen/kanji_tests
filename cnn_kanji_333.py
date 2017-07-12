@@ -152,7 +152,7 @@ def main(_):
             W_conv3 = weight_variable([kernel_size, kernel_size, 32, 64], "w3")
             variable_summaries(W_conv3)
         with tf.name_scope('biases'):
-            b_conv3 = bias_variable([32], "b3")
+            b_conv3 = bias_variable([64], "b3")
         with tf.name_scope('activations'):
             h_conv3 = tf.nn.relu(conv2d(h_pool1, W_conv3) + b_conv3)
             variable_summaries(h_conv3)
