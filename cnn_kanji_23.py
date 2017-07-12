@@ -60,7 +60,9 @@ def main(_):
         length = int(len(validation) / test_batch)
         for i in range(length):
             a = i*test_batch
-            pred_list = pred_list + prediction.eval(feed_dict={x: validation[a:a + test_batch],y_: v_labels[a:a + test_batch],keep_prob: 1.0}, session=sess).tolist()
+            pred_list = pred_list + prediction.eval(
+                feed_dict={x: validation[a:a + test_batch],y_: v_labels[a:a + test_batch],keep_prob: 1.0},
+                session=sess).tolist()
 
         write_file = str(save_location + run_number + '_predictions.txt')
         with open(write_file, 'w') as f:
@@ -97,6 +99,7 @@ def main(_):
     net_name = 'cnn_kanji_23'
     cwd = str(os.getcwd())
     save_location = str(cwd + '/tensorflow/cnn_kanji/' + net_name)
+    print(save_location)
     run_number = '/1'
 
     # Import data

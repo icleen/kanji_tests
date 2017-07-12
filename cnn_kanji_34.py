@@ -95,11 +95,11 @@ def main(_):
     epochs = 20
     kernel_size = 3
     learn_rate = 0.0001
-    net_name = 'cnn_kanji_222'
+    net_name = 'cnn_kanji_34'
     cwd = str(os.getcwd())
     save_location = str(cwd + '/tensorflow/cnn_kanji/' + net_name)
     print(save_location)
-    run_number = '/1'
+    run_number = '/0'
 
     # Import data
     training, t_labels, validation, val_labels = prep.data_from_base('train_val_test_data_32')
@@ -120,10 +120,10 @@ def main(_):
     # adding the first convolutional layer
     with tf.name_scope('conv_layer1'):
         with tf.name_scope('weights'):
-            W_conv1 = weight_variable([kernel_size, kernel_size, 1, 32], "w1")
+            W_conv1 = weight_variable([kernel_size, kernel_size, 1, 64], "w1")
             variable_summaries(W_conv1)
         with tf.name_scope('biases'):
-            b_conv1 = bias_variable([32], "b1")
+            b_conv1 = bias_variable([64], "b1")
         with tf.name_scope('activations'):
             h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
             variable_summaries(h_conv1)
@@ -131,10 +131,10 @@ def main(_):
     # adding the second convolutional layer
     with tf.name_scope('conv_layer2'):
         with tf.name_scope('weights'):
-            W_conv2 = weight_variable([kernel_size, kernel_size, 32, 32], "w2")
+            W_conv2 = weight_variable([kernel_size, kernel_size, 64, 64], "w2")
             variable_summaries(W_conv2)
         with tf.name_scope('biases'):
-            b_conv2 = bias_variable([32], "b2")
+            b_conv2 = bias_variable([64], "b2")
         with tf.name_scope('activations'):
             h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2) + b_conv2)
             variable_summaries(h_conv2)
@@ -149,10 +149,10 @@ def main(_):
     # adding the third convolutional layer
     with tf.name_scope('conv_layer3'):
         with tf.name_scope('weights'):
-            W_conv3 = weight_variable([kernel_size, kernel_size, 32, 64], "w3")
+            W_conv3 = weight_variable([kernel_size, kernel_size, 64, 128], "w3")
             variable_summaries(W_conv3)
         with tf.name_scope('biases'):
-            b_conv3 = bias_variable([64], "b3")
+            b_conv3 = bias_variable([128], "b3")
         with tf.name_scope('activations'):
             h_conv3 = tf.nn.relu(conv2d(h_pool1, W_conv3) + b_conv3)
             variable_summaries(h_conv3)
@@ -160,10 +160,10 @@ def main(_):
     # adding the fourth convolutional layer
     with tf.name_scope('conv_layer4'):
         with tf.name_scope('weights'):
-            W_conv4 = weight_variable([kernel_size, kernel_size, 64, 64], "w4")
+            W_conv4 = weight_variable([kernel_size, kernel_size, 128, 128], "w4")
             variable_summaries(W_conv4)
         with tf.name_scope('biases'):
-            b_conv4 = bias_variable([64], "b4")
+            b_conv4 = bias_variable([128], "b4")
         with tf.name_scope('activations'):
             h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
             variable_summaries(h_conv4)
@@ -174,16 +174,43 @@ def main(_):
     #     pool2_img = tf.reshape(h_pool2, [-1,width,height,1])
     #     tf.summary.image('pool2', pool2_img, classes)
 
-    h_pool2_flat = tf.reshape(h_pool2, [-1, 8 * 8 * 64])
+    # adding the fifth convolutional layer
+    with tf.name_scope('conv_layer5'):
+        with tf.name_scope('weights'):
+            W_conv5 = weight_variable([kernel_size, kernel_size, 128, 256], "w5")
+            variable_summaries(W_conv5)
+        with tf.name_scope('biases'):
+            b_conv5 = bias_variable([256], "b5")
+        with tf.name_scope('activations'):
+            h_conv5 = tf.nn.relu(conv2d(h_pool2, W_conv5) + b_conv5)
+            variable_summaries(h_conv5)
+
+    # adding the sixth convolutional layer
+    with tf.name_scope('conv_layer6'):
+        with tf.name_scope('weights'):
+            W_conv6 = weight_variable([kernel_size, kernel_size, 256, 256], "w6")
+            variable_summaries(W_conv6)
+        with tf.name_scope('biases'):
+            b_conv6 = bias_variable([256], "b6")
+        with tf.name_scope('activations'):
+            h_conv6 = tf.nn.relu(conv2d(h_conv5, W_conv6) + b_conv6)
+            variable_summaries(h_conv6)
+
+    # the third pooling layer
+    with tf.name_scope('pooling3'):
+        h_pool3 = max_pool_2x2(h_conv6)
+    #     pool3_img = tf.reshape(h_pool3, [-1,width,height,1])
+    #     tf.summary.image('pool3', pool3_img, classes)
+    h_pool3_flat = tf.reshape(h_pool3, [-1, 4 * 4 * 256])
 
     #adding the final layer
     with tf.name_scope('fully_connected1'):
-        W_fc1 = weight_variable([8 * 8 * 64, 3442], "W_fc1")
+        W_fc1 = weight_variable([4 * 4 * 256, 3442], "W_fc1")
         b_fc1 = bias_variable([3442], "b_fc1")
         with tf.name_scope('weights'):
             variable_summaries(W_fc1)
         with tf.name_scope('activations'):
-            h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+            h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
             variable_summaries(h_fc1)
 
     # adding the dropout
