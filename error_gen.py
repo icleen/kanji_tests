@@ -8,7 +8,7 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
     # home_path = str('file://' + cwd)
     # print(home_path)
 
-    home_path = str('file:///home/iclee141/workspace/kanji_tests')
+    home_path = str('file:///home/iclee141/workspace/kanji_tests/predictions')
 
     predictions = []
     correct = []
@@ -55,12 +55,13 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
         with open(file_path, 'w') as f:
             f.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
-            f.write('<img src="' + home_path + '/' + img_path + '" height="100" width="100">')
-            f.write('<p>Predicted: </p>')
-            f.write('<a href="http://www.fileformat.info/info/unicode/char/' + pred_utf + '/index.htm">' + pred_str + '</a>')
-            f.write('<p>Ground Truth: </p>')
-            f.write('<a href="http://www.fileformat.info/info/unicode/char/' + cor_utf + '/index.htm">' + cor_str + '</a>')
-            f.write('<p></p>')
+            f.write('<img src="' + home_path + '/' + img_path + '" height="100" width="100">\n')
+            f.write('<p>Predicted: </p>\n')
+            f.write('<a href="http://www.fileformat.info/info/unicode/char/' + pred_utf + '/index.htm" target="_blank">' + pred_str + '</a>\n')
+            # f.write('<img src="www.fileformat.info/info/unicode/char/' + pred_utf + '/sample.svg" height="100" width="100">\n')
+            f.write('<p>Ground Truth: </p>\n')
+            f.write('<a href="http://www.fileformat.info/info/unicode/char/' + cor_utf + '/index.htm" target="_blank">' + cor_str + '</a>\n')
+            # f.write('<img src="www.fileformat.info/info/unicode/char/' + cor_utf + '/sample.svg" height="100" width="100">\n')
 
             f.write('</body>\n</html>\n')
 
@@ -71,14 +72,14 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
         f.write('<h1>errors</h1>\n')
         for error in errors:
             f.write('<a href="' + error[0] + '">' + error[1] + '</a>\n')
-            f.write('<p></p>')
+            # f.write('<p></p>')
 
 
         f.write('<hr>\n')
         f.write('<h1>correct predictions</h1>\n')
         for cor in cors:
             f.write('<a href="' + cor[0] + '">' + cor[1] + '</a>\n')
-            f.write('<p></p>')
+            # f.write('<p></p>')
 
 
         f.write('</body>\n</html>\n')

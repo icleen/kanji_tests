@@ -82,6 +82,7 @@ def main(_):
             validation_writer.add_summary(summary, step + i)
             tot_acc += acc
         tot_acc /= length
+        write_predictions()
         return tot_acc
     # Hyper-parameters
     width, height = 32, 32
@@ -89,13 +90,14 @@ def main(_):
     classes = 1721
     batch_size = 50
     test_batch = 533 # number in set = 6396, 6396 / 12 = 533
-    steps = 5000
-    epochs = 15
+    steps = 20000
+    epochs = 20
     kernel_size = 3
     learn_rate = 0.0001
     net_name = 'cnn_kanji_23'
-    save_location = str('/tmp/tensorflow/cnn_kanji/' + net_name)
-    run_number = '/0'
+    cwd = str(os.getcwd())
+    save_location = str(cwd + '/tensorflow/cnn_kanji/' + net_name)
+    run_number = '/1'
 
     # Import data
     training, t_labels, validation, val_labels = prep.data_from_base('train_val_test_data_32')
@@ -216,11 +218,14 @@ def main(_):
     with tf.name_scope('fully_connected2'):
         with tf.name_scope('weights'):
             W_fc2 = weight_variable([3442, 3442], "W_fc2")
-            variable_summaries(W_fc1)
+            variable_summaries(W_fc2)
         b_fc2 = bias_variable([3442], "b_fc2")
         with tf.name_scope('activations'):
             h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
             variable_summaries(h_fc2)
+
+    # adding the dropout
+    h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
 
     # adding the readout layer
     with tf.name_scope('readout_layer'):
@@ -229,7 +234,7 @@ def main(_):
             variable_summaries(W_fc_read)
         b_fc_read = bias_variable([classes], "b_read")
         with tf.name_scope('activations'):
-            y_conv = tf.matmul(h_fc2, W_fc_read) + b_fc_read
+            y_conv = tf.matmul(h_fc2_drop, W_fc_read) + b_fc_read
             variable_summaries(y_conv)
 
     # The raw formulation of cross-entropy,
@@ -263,7 +268,7 @@ def main(_):
     # if os.path.exists(os.path.join(save_location + run_number)):
     #     saver.restore(sess, save_location + run_number + "/model.ckpt")
 
-    write_predictions()
+    # write_predictions()
 
     epoch = -1
     i = -1
@@ -286,7 +291,7 @@ def main(_):
             acc = get_accuracy(i)
             print("epoch %d, validation accuracy %g"%(epoch, acc))
 
-    write_predictions()
+    # write_predictions()
 
     save_path = saver.save(sess, save_location + run_number + "/model.ckpt", i + 1)
     train_writer.close()

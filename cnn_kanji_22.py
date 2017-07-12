@@ -82,6 +82,7 @@ def main(_):
             validation_writer.add_summary(summary, step + i)
             tot_acc += acc
         tot_acc /= length
+        write_predictions()
         return tot_acc
     # Hyper-parameters
     width, height = 32, 32
@@ -189,7 +190,7 @@ def main(_):
     with tf.name_scope('fully_connected2'):
         with tf.name_scope('weights'):
             W_fc2 = weight_variable([3442, 3442], "W_fc2")
-            variable_summaries(W_fc1)
+            variable_summaries(W_fc2)
         b_fc2 = bias_variable([3442], "b_fc2")
         with tf.name_scope('activations'):
             h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
@@ -236,7 +237,7 @@ def main(_):
     # if os.path.exists(os.path.join(save_location + run_number)):
     #     saver.restore(sess, save_location + run_number + "/model.ckpt")
 
-    write_predictions()
+    # write_predictions()
 
     epoch = -1
     i = -1
@@ -259,7 +260,7 @@ def main(_):
             acc = get_accuracy(i)
             print("epoch %d, validation accuracy %g"%(epoch, acc))
 
-    write_predictions()
+    # write_predictions()
 
     save_path = saver.save(sess, save_location + run_number + "/model.ckpt", i + 1)
     train_writer.close()

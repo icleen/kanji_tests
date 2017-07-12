@@ -47,7 +47,8 @@ def make_sprites(json_path, img_size, number_per_folder):
             string = str(str(i) + '_' + str(label) + '\n')
             f.write(string)
 
-def make_one_sprite(index, number_per_folder, img_size, folder, subdir, sprite_img, save_path):
+def make_one_sprite(index, number_per_folder, img_size, folder, subdir,
+                                                    sprite_img, save_path):
     #get your images using glob
     iconMap = glob.glob(folder + '/' + subdir + '/*.jpg')
     iconMap = sorted(iconMap)
