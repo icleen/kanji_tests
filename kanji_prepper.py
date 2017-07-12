@@ -56,11 +56,11 @@ def make_json():
         json.dump(labels[test_cnt:], f)
 
 def data_to_base():
-    size = (32, 32)
+    size = (64, 64)
     training, t_labels = get_data_json('training.json', size)
     validation, v_labels = get_data_json('validation.json', size)
     test, test_labels = get_data_json('test.json', size)
-    with h5py.File('train_val_test_data_32', 'w') as hf:
+    with h5py.File('train_val_test_data_64', 'w') as hf:
          hf.create_dataset('training', data = training[:])
          hf.create_dataset('t_labels', data = t_labels[:])
          hf.create_dataset('validation', data = validation[:])
