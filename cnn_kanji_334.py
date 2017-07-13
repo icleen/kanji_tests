@@ -61,18 +61,32 @@ def main(_):
         for i in range(length):
             a = i*test_batch
             pred_list = pred_list + prediction.eval(feed_dict={x: validation[a:a + test_batch],y_: v_labels[a:a + test_batch],keep_prob: 1.0}, session=sess).tolist()
+        pred_list += prediction.eval(feed_dict={x: validation[length * test_batch:],y_: v_labels[length * test_batch:],keep_prob: 1.0}, session=sess).tolist()
+        # print(len(validation))
+        # print(len(pred_list))
+
+        class_acc = {}
+        class_amount = {}
+        for i, pred in enumerate(pred_list):
+            class_amount[val_labels[i]] = 0
+            class_acc[val_labels[i]] = 0
+        for i, pred in enumerate(pred_list):
+            class_amount[val_labels[i]] += 1
+            if pred == val_labels[i]:
+                class_acc[val_labels[i]] += 1
 
         write_file = str(save_location + run_number + '_predictions.txt')
         with open(write_file, 'w') as f:
             for i, pred in enumerate(pred_list):
-                string = str(str(pred) + ' ' + str(val_labels[i]) + '\n')
+                string = str(str(pred) + ' ' + str(val_labels[i]) + ' ' + str(float(class_acc[val_labels[i]] / class_amount[val_labels[i]])) + '\n')
                 f.write(string)
-        error_gen.make_html(str(net_name + '_3'), write_file, 'kanji_dictionary.json', 'validation.json')
+        error_gen.make_html(str(net_name + '_6'), write_file, 'kanji_dictionary.json', 'validation.json')
 
     # get accuracy
     def get_accuracy(step):
         tot_acc = 0.0
         length = int(len(validation) / test_batch)
+        leftover = len(validation) - (length * test_batch)
         for i in range(length):
             a = i*test_batch
             summary, acc = sess.run([merged, accuracy], feed_dict={
@@ -81,7 +95,15 @@ def main(_):
                 keep_prob: 1.0})
             validation_writer.add_summary(summary, step + i)
             tot_acc += acc
-        tot_acc /= length
+
+        summary, acc = sess.run([merged, accuracy], feed_dict={
+            x: validation[length * test_batch:],
+            y_: v_labels[length * test_batch:],
+            keep_prob: 1.0})
+        validation_writer.add_summary(summary, step + length)
+        tot_acc += acc
+
+        tot_acc /= length + (leftover / test_batch)
         write_predictions()
         return tot_acc
 
@@ -89,8 +111,8 @@ def main(_):
     width, height = 32, 32
     size = (width, height)
     classes = 1721
-    batch_size = 50
-    test_batch = 300
+    batch_size = 100
+    test_batch = 500
     steps = 20000
     epochs = 50
     kernel_size = 3
@@ -99,7 +121,7 @@ def main(_):
     cwd = str(os.getcwd())
     save_location = str(cwd + '/tensorflow/cnn_kanji/' + net_name)
     print(save_location)
-    run_number = '/3'
+    run_number = '/6'
 
     # Import data
     database = 'train_val_test_data_32'
@@ -237,8 +259,8 @@ def main(_):
 
     #adding the final layer
     with tf.name_scope('fully_connected1'):
-        W_fc1 = weight_variable([2 * 2 * 256, 3442], "W_fc1")
-        b_fc1 = bias_variable([3442], "b_fc1")
+        W_fc1 = weight_variable([2 * 2 * 256, 1024], "W_fc1")
+        b_fc1 = bias_variable([1024], "b_fc1")
         with tf.name_scope('weights'):
             variable_summaries(W_fc1)
         with tf.name_scope('activations'):
@@ -252,7 +274,7 @@ def main(_):
     # adding the readout layer
     with tf.name_scope('readout_layer'):
         with tf.name_scope('weights'):
-            W_fc_read = weight_variable([3442, classes], "w_read")
+            W_fc_read = weight_variable([1024, classes], "w_read")
             variable_summaries(W_fc_read)
         b_fc_read = bias_variable([classes], "b_read")
         with tf.name_scope('activations'):

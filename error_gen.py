@@ -12,12 +12,14 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
 
     predictions = []
     correct = []
+    acc = []
     temp = []
     with open(prediction_file, 'r') as f:
         for line in f:
             temp = line.split()
             predictions.append(temp[0])
             correct.append(temp[1])
+            acc.append(temp[2])
 
     with open(dictionary_file, 'r') as f:
         temp_dict = json.load(f)
@@ -29,8 +31,8 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
 
     with open(validation_file, 'r') as f:
         pics = json.load(f)
-    print( str('number of pics: ' + str(len(pics))) )
-    print( str('number of pics: ' + str(len(predictions))) )
+    # print( str('number of pics: ' + str(len(pics))) )
+    # print( str('number of preds: ' + str(len(predictions))) )
 
     root = str(net_name + '_prediction_errors')
     if not os.path.isdir(root):
@@ -56,11 +58,12 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
             with open(file_path, 'w') as f:
                 f.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
+                f.write('<p>' + img_path + '</p>')
                 f.write('<img src="' + home_path + '/' + img_path + '" height="100" width="100">\n')
-                f.write('<p>Predicted: </p>\n')
+                f.write('<h2>Predicted: - &#x' + pred_utf + '; </h2>\n')
                 f.write('<a href="http://www.fileformat.info/info/unicode/char/' + pred_utf + '/index.htm" target="_blank">' + pred_str + '</a>\n')
                 # f.write('<img src="www.fileformat.info/info/unicode/char/' + pred_utf + '/sample.svg" height="100" width="100">\n')
-                f.write('<p>Ground Truth: </p>\n')
+                f.write('<h2>Ground Truth: - &#x' + cor_utf + '; ' + acc[i] + '</h2>\n')
                 f.write('<a href="http://www.fileformat.info/info/unicode/char/' + cor_utf + '/index.htm" target="_blank">' + cor_str + '</a>\n')
                 # f.write('<img src="www.fileformat.info/info/unicode/char/' + cor_utf + '/sample.svg" height="100" width="100">\n')
 
@@ -70,14 +73,14 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
     with open(html_file, 'w') as f:
         f.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
-        f.write('<h1>errors</h1>\n')
+        f.write('<h1>Errors</h1>\n')
         errors.sort(key=lambda x: x[1])
         for error in errors:
             f.write('<a href="' + error[0] + '">' + error[1] + '</a>\n')
             # f.write('<p></p>')
 
         f.write('<hr>\n')
-        f.write('<h1>correct predictions</h1>\n')
+        f.write('<h1>Correct Predictions</h1>\n')
         cors.sort(key=lambda x: x[1])
         for cor in cors:
             f.write('<a href="' + cor[0] + '">' + cor[1] + '</a>\n')

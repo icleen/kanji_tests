@@ -104,7 +104,7 @@ def data_to_base(classes):
     training, t_labels = get_data_json('training.json', size)
     validation, v_labels = get_data_json('validation.json', size)
     test, test_labels = get_data_json('test.json', size)
-    with h5py.File('train_val_test_data_32', 'w') as hf:
+    with h5py.File('train_val_test_data_32_distort', 'w') as hf:
         hf.create_dataset('classes', data = classes)
         hf.create_dataset('training', data = training[:])
         hf.create_dataset('t_labels', data = t_labels[:])
@@ -125,8 +125,8 @@ def data_from_base(data_file):
 
 def classes_from_base(data_file):
     with h5py.File(data_file,'r') as hf:
-        classes = int(hf.get('classes'))
-    return classes
+        classes = np.array(hf.get('classes'))
+    return int(classes)
 
 def training_from_base(data_file):
     with h5py.File(data_file,'r') as hf:
