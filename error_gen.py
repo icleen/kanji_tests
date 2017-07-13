@@ -29,54 +29,56 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
 
     with open(validation_file, 'r') as f:
         pics = json.load(f)
+    print( str('number of pics: ' + str(len(pics))) )
+    print( str('number of pics: ' + str(len(predictions))) )
 
-
-    root = str('/predictions/' + net_name + '_prediction_errors')
+    root = str(net_name + '_prediction_errors')
     if not os.path.isdir(root):
         os.makedirs(root)
 
     errors = []
     cors = []
-    for i, pic in enumerate(pics):
-        img_path = pic['image_path']
-        pred = predictions[i]
-        cor = correct[i]
-        pred_str = dictionary[pred]
-        pred_utf = pred_str.split('+')[1]
-        cor_str = dictionary[cor]
-        cor_utf = cor_str.split('+')[1]
+    for i, pred in enumerate(predictions):
+        if i < len(pics):
+            img_path = pics[i]['image_path']
+            cor = correct[i]
+            pred_str = dictionary[pred]
+            pred_utf = pred_str.split('+')[1]
+            cor_str = dictionary[cor]
+            cor_utf = cor_str.split('+')[1]
 
-        file_path = str(root + '/' + str(i) + '_' + cor_str + '.html')
-        full_path = str(home_path + '/' + file_path)
-        if pred == cor:
-            cors.append((full_path, dictionary[cor]))
-        else:
-            errors.append((full_path, dictionary[cor]))
-        with open(file_path, 'w') as f:
-            f.write('<!DOCTYPE html>\n<html>\n<body>\n')
+            file_path = str(root + '/' + str(i) + '_' + cor_str + '.html')
+            full_path = str(home_path + '/' + file_path)
+            if pred == cor:
+                cors.append((full_path, dictionary[cor]))
+            else:
+                errors.append((full_path, dictionary[cor]))
+            with open(file_path, 'w') as f:
+                f.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
-            f.write('<img src="' + home_path + '/' + img_path + '" height="100" width="100">\n')
-            f.write('<p>Predicted: </p>\n')
-            f.write('<a href="http://www.fileformat.info/info/unicode/char/' + pred_utf + '/index.htm" target="_blank">' + pred_str + '</a>\n')
-            # f.write('<img src="www.fileformat.info/info/unicode/char/' + pred_utf + '/sample.svg" height="100" width="100">\n')
-            f.write('<p>Ground Truth: </p>\n')
-            f.write('<a href="http://www.fileformat.info/info/unicode/char/' + cor_utf + '/index.htm" target="_blank">' + cor_str + '</a>\n')
-            # f.write('<img src="www.fileformat.info/info/unicode/char/' + cor_utf + '/sample.svg" height="100" width="100">\n')
+                f.write('<img src="' + home_path + '/' + img_path + '" height="100" width="100">\n')
+                f.write('<p>Predicted: </p>\n')
+                f.write('<a href="http://www.fileformat.info/info/unicode/char/' + pred_utf + '/index.htm" target="_blank">' + pred_str + '</a>\n')
+                # f.write('<img src="www.fileformat.info/info/unicode/char/' + pred_utf + '/sample.svg" height="100" width="100">\n')
+                f.write('<p>Ground Truth: </p>\n')
+                f.write('<a href="http://www.fileformat.info/info/unicode/char/' + cor_utf + '/index.htm" target="_blank">' + cor_str + '</a>\n')
+                # f.write('<img src="www.fileformat.info/info/unicode/char/' + cor_utf + '/sample.svg" height="100" width="100">\n')
 
-            f.write('</body>\n</html>\n')
+                f.write('</body>\n</html>\n')
 
     html_file = str(net_name + '_predictions.html')
     with open(html_file, 'w') as f:
         f.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
         f.write('<h1>errors</h1>\n')
+        errors.sort(key=lambda x: x[1])
         for error in errors:
             f.write('<a href="' + error[0] + '">' + error[1] + '</a>\n')
             # f.write('<p></p>')
 
-
         f.write('<hr>\n')
         f.write('<h1>correct predictions</h1>\n')
+        cors.sort(key=lambda x: x[1])
         for cor in cors:
             f.write('<a href="' + cor[0] + '">' + cor[1] + '</a>\n')
             # f.write('<p></p>')

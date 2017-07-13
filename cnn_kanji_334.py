@@ -67,7 +67,7 @@ def main(_):
             for i, pred in enumerate(pred_list):
                 string = str(str(pred) + ' ' + str(val_labels[i]) + '\n')
                 f.write(string)
-        error_gen.make_html(net_name, write_file, 'kanji_dictionary.json', 'validation.json')
+        error_gen.make_html(str(net_name + '_3'), write_file, 'kanji_dictionary.json', 'validation.json')
 
     # get accuracy
     def get_accuracy(step):
@@ -90,19 +90,22 @@ def main(_):
     size = (width, height)
     classes = 1721
     batch_size = 50
-    test_batch = 533 # number in set = 6396, 6396 / 12 = 533
+    test_batch = 300
     steps = 20000
-    epochs = 20
+    epochs = 50
     kernel_size = 3
     learn_rate = 0.0001
-    net_name = 'cnn_kanji_333'
+    net_name = 'cnn_kanji_334'
     cwd = str(os.getcwd())
     save_location = str(cwd + '/tensorflow/cnn_kanji/' + net_name)
     print(save_location)
-    run_number = '/0'
+    run_number = '/3'
 
     # Import data
-    training, t_labels, validation, val_labels = prep.data_from_base('train_val_test_data_32')
+    database = 'train_val_test_data_32'
+    training, t_labels, validation, val_labels = prep.data_from_base(database)
+    classes = prep.classes_from_base(database)
+    print(str('classes: ' + str(classes)))
     t_labels = onehot_labels(t_labels, classes)
     v_labels = onehot_labels(val_labels, classes)
 
@@ -292,9 +295,9 @@ def main(_):
     epoch = -1
     i = -1
     # Train
-    for i in range(steps):
-    # while epoch < epochs:
-        # i += 1
+    # for i in range(steps):
+    while epoch < epochs:
+        i += 1
         a = i*batch_size % len(training)
         batchx = training[a:a + batch_size]
         batchy = t_labels[a:a + batch_size]

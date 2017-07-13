@@ -90,16 +90,16 @@ def main(_):
     size = (width, height)
     classes = 1721
     batch_size = 50
-    test_batch = 533 # number in set = 6396, 6396 / 12 = 533
+    test_batch = 300
     steps = 20000
-    epochs = 20
+    epochs = 30
     kernel_size = 3
     learn_rate = 0.0001
-    net_name = 'cnn_kanji_34'
+    net_name = 'cnn_kanji_344'
     cwd = str(os.getcwd())
     save_location = str(cwd + '/tensorflow/cnn_kanji/' + net_name)
     print(save_location)
-    run_number = '/0'
+    run_number = '/1'
 
     # Import data
     training, t_labels, validation, val_labels = prep.data_from_base('train_val_test_data_32')
