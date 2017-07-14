@@ -7,13 +7,13 @@ import codecs
 import numpy as np
 from scipy import ndimage, misc
 
-def make_dictionary(folder_list):
+def make_dictionary(folder_list, dataset_name):
     key = ''
     dictionary = {}
     for i, folder in enumerate(folder_list):
         key = os.path.basename(folder).split('/')[0]
         dictionary[key] = i
-    with open('kanji_dictionary.json', 'w') as f:
+    with open('kanji_dictionary' + dataset_name + '.json', 'w') as f:
         json.dump(dictionary, f)
     return dictionary
 
@@ -44,7 +44,7 @@ def make_json(dataset_name):
             val_list += file_list[train_cnt:train_cnt+val_cnt]
             test_list += file_list[train_cnt+val_cnt:train_cnt+val_cnt+test_cnt]
 
-    dictionary = make_dictionary(folder_list)
+    dictionary = make_dictionary(folder_list, dataset_name)
 
     train_list = np.array(train_list)
     np.random.shuffle(train_list)

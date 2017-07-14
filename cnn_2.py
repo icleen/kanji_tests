@@ -82,7 +82,7 @@ def main(_):
                     str(class_acc[val_labels[i]]) + '/' + str(class_amount[val_labels[i]]) + '=' +
                     str(float(class_acc[val_labels[i]] / class_amount[val_labels[i]])) + '\n')
                 f.write(string)
-        error_gen.make_html(str(net_name + '_0'), write_file, 'kanji_dictionary.json', 'validation.json')
+        error_gen.make_html(str(net_name + '_0'), write_file, 'kanji_dictionary_32_distort2.json', 'validation_32_distort2.json')
 
     # get accuracy
     def get_accuracy(step):
@@ -200,7 +200,7 @@ def main(_):
         h_pool2 = max_pool_2x2(h_conv4)
     #     pool2_img = tf.reshape(h_pool2, [-1,width,height,1])
     #     tf.summary.image('pool2', pool2_img, classes)
-    h_pool2_flat = tf.reshape(h_pool4, [-1, 8 * 8 * 256])
+    h_pool2_flat = tf.reshape(h_pool2, [-1, 8 * 8 * 256])
 
     #adding the final layer
     with tf.name_scope('fully_connected1'):

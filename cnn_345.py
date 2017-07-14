@@ -82,7 +82,7 @@ def main(_):
                     str(class_acc[val_labels[i]]) + '/' + str(class_amount[val_labels[i]]) + '=' +
                     str(float(class_acc[val_labels[i]] / class_amount[val_labels[i]])) + '\n')
                 f.write(string)
-        error_gen.make_html(str(net_name + '_0'), write_file, 'kanji_dictionary.json', 'validation.json')
+        error_gen.make_html(str(net_name + '_0'), write_file, 'kanji_dictionary_32_distort2.json', 'validation_32_distort2.json')
 
     # get accuracy
     def get_accuracy(step):
