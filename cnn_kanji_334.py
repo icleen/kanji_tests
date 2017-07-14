@@ -78,9 +78,11 @@ def main(_):
         write_file = str(save_location + run_number + '_predictions.txt')
         with open(write_file, 'w') as f:
             for i, pred in enumerate(pred_list):
-                string = str(str(pred) + ' ' + str(val_labels[i]) + ' ' + str(float(class_acc[val_labels[i]] / class_amount[val_labels[i]])) + '\n')
+                string = str(str(pred) + ' ' + str(val_labels[i]) + ' ' +
+                    str(class_acc[val_labels[i]]) + '/' + str(class_amount[val_labels[i]]) + '=' +
+                    str(float(class_acc[val_labels[i]] / class_amount[val_labels[i]])) + '\n')
                 f.write(string)
-        error_gen.make_html(str(net_name + '_6'), write_file, 'kanji_dictionary.json', 'validation.json')
+        error_gen.make_html(str(net_name + '_7'), write_file, 'kanji_dictionary.json', 'validation.json')
 
     # get accuracy
     def get_accuracy(step):
@@ -114,17 +116,17 @@ def main(_):
     batch_size = 100
     test_batch = 500
     steps = 20000
-    epochs = 50
+    epochs = 60
     kernel_size = 3
     learn_rate = 0.0001
     net_name = 'cnn_kanji_334'
     cwd = str(os.getcwd())
     save_location = str(cwd + '/tensorflow/cnn_kanji/' + net_name)
     print(save_location)
-    run_number = '/6'
+    run_number = '/7'
 
     # Import data
-    database = 'train_val_test_data_32'
+    database = 'train_val_test_data_32_distort'
     training, t_labels, validation, val_labels = prep.data_from_base(database)
     classes = prep.classes_from_base(database)
     print(str('classes: ' + str(classes)))

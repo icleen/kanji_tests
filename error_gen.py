@@ -67,6 +67,13 @@ def make_html(net_name, prediction_file, dictionary_file, validation_file):
                 f.write('<a href="http://www.fileformat.info/info/unicode/char/' + cor_utf + '/index.htm" target="_blank">' + cor_str + '</a>\n')
                 # f.write('<img src="www.fileformat.info/info/unicode/char/' + cor_utf + '/sample.svg" height="100" width="100">\n')
 
+                # if pred == cor:
+                #
+                # if i > 0 and len(cors) > i:
+                #     f.write('<a href="' + cors[i - 1][0] + '" target="_blank">back  </a>\n')
+                # if i < len(cors) - 1:
+                #     f.write('<a href="' + cors[i + 1][0] + '" target="_blank">  next</a>\n')
+
                 f.write('</body>\n</html>\n')
 
     html_file = str(net_name + '_predictions.html')
