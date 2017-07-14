@@ -17,7 +17,7 @@ def make_dictionary(folder_list):
         json.dump(dictionary, f)
     return dictionary
 
-def make_json():
+def make_json(dataset_name):
     images_path = 'kanji_dataset/characters/'
     file_list = []
     train_list = []
@@ -67,13 +67,13 @@ def make_json():
         gt = os.path.basename(file).split('_')[0]
         test_labels.append({"gt": dictionary[gt], "image_path": file})
 
-    with open("training.json", 'w') as f:
+    with open("training" + dataset_name + ".json", 'w') as f:
         json.dump(train_labels[:], f)
 
-    with open("validation.json", 'w') as f:
+    with open("validation" + dataset_name + ".json", 'w') as f:
         json.dump(val_labels[:], f)
 
-    with open("test.json", 'w') as f:
+    with open("test" + dataset_name + ".json", 'w') as f:
         json.dump(test_labels[:], f)
 
     return len(folder_list)
@@ -99,12 +99,12 @@ def get_data_json(file_path, size):
     train /= 255.0
     return train, labels
 
-def data_to_base(classes):
+def data_to_base(classes, dataset_name):
     size = (32, 32)
-    training, t_labels = get_data_json('training.json', size)
-    validation, v_labels = get_data_json('validation.json', size)
-    test, test_labels = get_data_json('test.json', size)
-    with h5py.File('train_val_test_data_32_distort', 'w') as hf:
+    training, t_labels = get_data_json('training' + dataset_name + '.json', size)
+    validation, v_labels = get_data_json('validation' + dataset_name + '.json', size)
+    test, test_labels = get_data_json('test' + dataset_name + '.json', size)
+    with h5py.File('train_val_test_data' + dataset_name, 'w') as hf:
         hf.create_dataset('classes', data = classes)
         hf.create_dataset('training', data = training[:])
         hf.create_dataset('t_labels', data = t_labels[:])
@@ -147,6 +147,7 @@ def test_from_base(data_file):
     return test, test_labels
 
 if __name__ == '__main__':
-    classes = make_json()
+    dataset_name = '_32_distort2'
+    classes = make_json(dataset_name)
     print('to json')
-    data_to_base(classes)
+    data_to_base(classes, dataset_name)
